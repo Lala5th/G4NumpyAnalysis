@@ -38,12 +38,11 @@ int NumpyAnalysisManager::CreateDataset(std::string name, int dim){
     return id;
 }
 
-void NumpyAnalysisManager::AddData(int id, double d, double* coords){
+void NumpyAnalysisManager::AddData(int id, double* input){
     instanceMutex.lock();
     for(int i = 0; i < dataDim[id]; i++){
-        data[id]->push_back(coords[i]);
+        data.at(id)->push_back(input[i]);
     }
-    data[id]->push_back(d);
     instanceMutex.unlock();
 }
 
@@ -53,7 +52,7 @@ void NumpyAnalysisManager::WriteData(){
     std::string stat = "w";
     for(size_t i = 0;i < data.size();i++){
         if(data[i]->empty()) continue;
-        cnpy::npz_save(fname,dataTitles[i],data[i]->data(),{data[i]->size()/(dataDim[i]+1),(dataDim[i]+1)},stat);
+        cnpy::npz_save(fname,dataTitles[i],data[i]->data(),{data[i]->size()/dataDim[i],dataDim[i]},stat);
         stat = "a";
     }
     if(stat == "w")

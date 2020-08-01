@@ -11,7 +11,7 @@ class NumpyAnalysisManager{
         ~NumpyAnalysisManager();
         void SetFilename(std::string);
         int CreateDataset(std::string,int);
-        void AddData(int,double,double*);
+        void AddData(int,double*);
         void WriteData();
         static NumpyAnalysisManager* GetInstance();
     private:
@@ -20,7 +20,7 @@ class NumpyAnalysisManager{
         std::string fname;
         std::vector<std::string> dataTitles;
         std::vector<std::vector<double>*> data;
-        std::vector<int> dataDim;
+        std::vector<unsigned int> dataDim;
 };
 
 #endif
