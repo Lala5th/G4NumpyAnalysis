@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 build
+=======
+./build/
+>>>>>>> 20124520e550a36abc64cf045e9e1095dc40cc06
 .ccls-cache/
 .ccls
 compile_commands.json
