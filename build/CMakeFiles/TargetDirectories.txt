@@ -1,7 +1,0 @@
-/home/lala5th/Documents/UROP/G4NumpyAnalysis/build/CMakeFiles/install/strip.dir
-/home/lala5th/Documents/UROP/G4NumpyAnalysis/build/CMakeFiles/install/local.dir
-/home/lala5th/Documents/UROP/G4NumpyAnalysis/build/CMakeFiles/install.dir
-/home/lala5th/Documents/UROP/G4NumpyAnalysis/build/CMakeFiles/list_install_components.dir
-/home/lala5th/Documents/UROP/G4NumpyAnalysis/build/CMakeFiles/rebuild_cache.dir
-/home/lala5th/Documents/UROP/G4NumpyAnalysis/build/CMakeFiles/edit_cache.dir
-/home/lala5th/Documents/UROP/G4NumpyAnalysis/build/CMakeFiles/G4NumpyAnalysis.dir
