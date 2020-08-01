@@ -1,0 +1,4 @@
+/home/lala5th/.local/lib/libG4NumpyAnalysis.so.1.0.0
+/home/lala5th/.local/lib/libG4NumpyAnalysis.so
+/home/lala5th/.local/include/NumpyAnalysisManager.hh
+/home/lala5th/.local/lib/cmake/g4numpyanalysis-1.0.0/g4numpyanalysis-config.cmake
