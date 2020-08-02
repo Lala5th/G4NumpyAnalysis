@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.9)
 
 project(G4NumpyAnalysis VERSION 1.0.0 DESCRIPTION "A wrapper for the cnpy library for use in Geant4 simulations")
 
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_library(G4NumpyAnalysis SHARED
 		${PROJECT_SOURCE_DIR}/NumpyAnalysisManager.cc
