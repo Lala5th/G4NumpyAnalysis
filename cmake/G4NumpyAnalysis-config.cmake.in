@@ -1,2 +1,2 @@
 set(G4NumpyAnalysis_INCLUDE_DIRS @CMAKE_INSTALL_PREFIX@/include)
-set(G4NumpyAnalysis_LIBRARIES -L@CMAKE_INSTALL_PREFIX@/lib G4NumpyAnalysis)
+set(G4NumpyAnalysis_LIBRARIES -L@CMAKE_INSTALL_PREFIX@/lib -L@CMAKE_INSTALL_PREFIX@/lib64 G4NumpyAnalysis)
