@@ -29,3 +29,7 @@ To use it include the NumpyAnalysisManager.hh header file.
 It implements a proprietary analysis manager, which is quite different from the analysis managers provided by Geant4. It is accessed similarly via invoking `NumpyAnalysisManager::GetInstance()`, which returns the active instance or creates an instance if it's not yet initialised. The other methods are `SetFilename(std::string)`, which changes the name of the output (default is out.npz). `CreateDataset(std::string title,int dim)`, which creates a new datatable with dim columns, while returning the id of the new datatable. `AddData(int id, double* row)` adds a row to the datatable with the matching id. Finalyl `WriteData()` writes the npz object to disk.
 
 While it is technically thread-safe, it is advisable that worker, threads do not access it, otherwise (if badly handled), the datatables might store the same data multiple times. In Geant4 the IsMaster() function can be quite helpful so worker threads do not accidentally smear the data.
+
+# Note
+
+This is a legacy branch, but as v2.0 rewrote the way data is handled and sometimes this might be more stable/preferable, it merited its own branch so improvements can be made more easily if need be.
