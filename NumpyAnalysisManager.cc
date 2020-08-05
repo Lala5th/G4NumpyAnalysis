@@ -27,32 +27,14 @@ void NumpyAnalysisManager::SetFilename(std::string name){
     instanceMutex.unlock();
 }
 
-int NumpyAnalysisManager::CreateDataset(std::string name, int dim){
-    instanceMutex.lock();
-    std::vector<double>* dataset = new std::vector<double>;
-    data.push_back(dataset);
-    dataTitles.push_back(name);
-    dataDim.push_back(dim);
-    int id = data.end() - data.begin() - 1;
-    instanceMutex.unlock();
-    return id;
-}
-
-void NumpyAnalysisManager::AddData(int id, double* input){
-    instanceMutex.lock();
-    for(int i = 0; i < dataDim[id]; i++){
-        data.at(id)->push_back(input[i]);
-    }
-    instanceMutex.unlock();
-}
 
 
 void NumpyAnalysisManager::WriteData(){
     instanceMutex.lock();
     std::string stat = "w";
     for(size_t i = 0;i < data.size();i++){
-        if(data[i]->empty()) continue;
-        cnpy::npz_save(fname,dataTitles[i],data[i]->data(),{data[i]->size()/dataDim[i],dataDim[i]},stat);
+        if(((std::vector<std::tuple<>>*)data[i])->empty()) continue;
+        writeFuncs[i](fname,dataTitles[i],data.at(i),stat);
         stat = "a";
     }
     if(stat == "w")
