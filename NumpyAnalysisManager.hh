@@ -7,7 +7,7 @@
 #include <tuple>
 #include <functional>
 
-#include "cnpy.h"
+#include "g4cnpy.h"
 
 
 class NumpyAnalysisManager{
@@ -23,8 +23,8 @@ class NumpyAnalysisManager{
             dataTitles.push_back(name);
             dataDim.push_back(sizeof...(COLS));
             int id = data.end() - data.begin() - 1;
-            auto write = [](std::string zipname, std::string fname, const void* data, std::string mode = "w"){
-                cnpy::npz_save<COLS...>(zipname,fname,*((std::vector<std::tuple<COLS...>>*)data),mode);
+            auto write = [](std::string zipname, std::string fn, const void* d, std::string mode){
+                g4cnpy::npz_save<COLS...>(zipname,fn,*((std::vector<std::tuple<COLS...>>*)d),mode);
             };
             writeFuncs.push_back(write);
             instanceMutex.unlock();

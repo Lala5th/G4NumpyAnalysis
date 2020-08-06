@@ -1,6 +1,6 @@
 #include "NumpyAnalysisManager.hh"
 
-#include "cnpy.h"
+#include "g4cnpy.h"
 
 #include <iostream>
 
