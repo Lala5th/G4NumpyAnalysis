@@ -30,3 +30,6 @@ jobs:
         cmake ..
         make
         ./test
+
+    - name: npz check
+      run: shasum -c ../test.hash
