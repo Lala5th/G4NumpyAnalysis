@@ -33,3 +33,4 @@ jobs:
 
     - name: npz check
       run: shasum -c ../test.hash
+      working-directory: ./build
