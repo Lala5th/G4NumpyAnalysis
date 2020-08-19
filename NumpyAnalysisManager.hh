@@ -33,7 +33,11 @@ class NumpyAnalysisManager{
         template<typename... COLS>
         void AddData(int id, COLS... input){
             instanceMutex.lock();
-            ((std::vector<std::tuple<COLS...>>*)data.at(id))->push_back(std::make_tuple(input...));
+            try{
+                ((std::vector<std::tuple<COLS...>>*)data.at(id))->push_back(std::make_tuple(input...));
+            }catch(std::out_of_range){
+                throw std::out_of_range("No dataset with ID " + std::to_string(id));
+            }
             instanceMutex.unlock();
         }
         void WriteData();
