@@ -12,7 +12,7 @@
 
 class NumpyAnalysisManager{
     public:
-        NumpyAnalysisManager();
+        NumpyAnalysisManager(bool = false);
         ~NumpyAnalysisManager();
         void SetFilename(std::string);
         template<typename... COLS>
@@ -43,6 +43,7 @@ class NumpyAnalysisManager{
         void WriteData();
         static NumpyAnalysisManager* GetInstance();
     private:
+        bool continousWrite;
         static NumpyAnalysisManager* instance;
         static std::mutex instanceMutex;
         std::string fname;
