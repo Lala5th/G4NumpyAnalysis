@@ -30,7 +30,6 @@ jobs:
         cmake ..
         make
         ./test
-        ./test_cont_out
 
     - name: npz check
       run: shasum -c ../test.hash
