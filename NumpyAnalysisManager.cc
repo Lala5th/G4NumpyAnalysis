@@ -7,8 +7,9 @@
 NumpyAnalysisManager* NumpyAnalysisManager::instance = 0;
 std::mutex NumpyAnalysisManager::instanceMutex;
 
-NumpyAnalysisManager::NumpyAnalysisManager(){
+NumpyAnalysisManager::NumpyAnalysisManager(bool contWrite){
     fname = "out.npz";
+    continousWrite = contWrite;
 }
 
 NumpyAnalysisManager::~NumpyAnalysisManager(){}

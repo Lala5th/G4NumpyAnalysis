@@ -1,4 +1,4 @@
-![CI](https://github.com/Lala5th/G4NumpyAnalysis/workflows/CI/badge.svg)
+![build](https://github.com/Lala5th/G4NumpyAnalysis/workflows/build/badge.svg)
 # G4NumpyAnalysis
 
 This is a wrapper class for a slightly modified [cnpy](https://github.com/rogersce/cnpy), which can write `std::tuple` objects developed for use in Geant4 simulations. While it was developed for the framework of Geant4, but it may be useful for other threaded applications, as such there is no dependence on Geant libraries.
