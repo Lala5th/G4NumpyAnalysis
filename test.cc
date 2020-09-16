@@ -9,6 +9,6 @@ int main(){
         man->AddData<int,double,float>(id,i,15.31,1.6);
     man->AddData<int,float>(id2,4,3.5);
     for(size_t i = 0; i < 1000; i++)
-    man->AddData<int,float>(id2,i,4.7);
+        man->AddData<int,float>(id2,i,4.7);
     man->WriteData();
 }
