@@ -39,6 +39,7 @@ jobs:
     - name: Build
       run: |
         mkdir build
+        cd build
         cmake -DCMAKE_PREFIX_PATH=~/.local ..
         make
         ./test
