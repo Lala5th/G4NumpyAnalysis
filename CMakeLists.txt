@@ -20,7 +20,7 @@ include(${PROJECT_SOURCE_DIR}/cmake/FindZipLib.cmake)
 include_directories(${ZLIB_INCLUDE_DIRS})
 include_directories(${LIBZIP_INCLUDE_DIRS})
 
-target_link_libraries(G4NumpyAnalysis ${ZLIB_LIBRARIES} zip)
+target_link_libraries(G4NumpyAnalysis ${ZLIB_LIBRARIES} ${LIBZIP_LIBRARY})
 
 set_target_properties(G4NumpyAnalysis PROPERTIES VERSION ${PROJECT_VERSION})
 set_target_properties(G4NumpyAnalysis PROPERTIES PUBLIC_HEADER ${PROJECT_SOURCE_DIR}/NumpyAnalysisManager.hh)
@@ -41,7 +41,7 @@ install(FILES "${PROJECT_BINARY_DIR}/g4numpyanalysis-config-version.cmake" DESTI
 
 
 add_executable(test test.cc ${sources} ${headers})
-target_link_libraries(test ${ZLIB_LIBRARIES} G4NumpyAnalysis zip)
+target_link_libraries(test ${ZLIB_LIBRARIES} G4NumpyAnalysis ${LIBZIP_LIBRARY})
 
 add_executable(test_cont_save test_cont_save.cc ${sources} ${headers})
-target_link_libraries(test_cont_save ${ZLIB_LIBRARIES} G4NumpyAnalysis zip)
+target_link_libraries(test_cont_save ${ZLIB_LIBRARIES} G4NumpyAnalysis ${LIBZIP_LIBRARY})
