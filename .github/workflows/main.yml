@@ -28,19 +28,18 @@ jobs:
         mkdir libzip
         cd libzip
         wget https://libzip.org/download/libzip-1.7.3.tar.gz
-        untar libzip-1.7.3.tar.gz
+        tar -xzvf libzip-1.7.3.tar.gz
         cd libzip-1.7.3
         mkdir build
         cd build
-        cmake -DCMAKE_INSTALL_PREFIX=../../ ..
+        cmake -DCMAKE_INSTALL_PREFIX=~/.local ..
         make
         make install
 
     - name: Build
       run: |
         mkdir build
-        cd build
-        cmake -DLIBZIP_DIR=libzip ..
+        cmake -DCMAKE_PREFIX_PATH=~/.local ..
         make
         ./test
 

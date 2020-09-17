@@ -14,12 +14,13 @@ add_library(G4NumpyAnalysis SHARED
 		${PROJECT_SOURCE_DIR}/g4cnpy.cpp)
 
 find_package(ZLIB REQUIRED)
-find_package(LIBZIP REQUIRED)
+
+include(${PROJECT_SOURCE_DIR}/cmake/FindZipLib.cmake)
 
 include_directories(${ZLIB_INCLUDE_DIRS})
 include_directories(${LIBZIP_INCLUDE_DIRS})
 
-target_link_libraries(G4NumpyAnalysis ${ZLIB_LIBRARIES})
+target_link_libraries(G4NumpyAnalysis ${ZLIB_LIBRARIES} zip)
 
 set_target_properties(G4NumpyAnalysis PROPERTIES VERSION ${PROJECT_VERSION})
 set_target_properties(G4NumpyAnalysis PROPERTIES PUBLIC_HEADER ${PROJECT_SOURCE_DIR}/NumpyAnalysisManager.hh)
