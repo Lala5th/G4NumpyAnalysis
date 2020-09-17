@@ -43,6 +43,7 @@ jobs:
         cmake -DCMAKE_PREFIX_PATH=~/.local ..
         make
         ./test
+        ./test_cont_save
 
     - name: npz check
       run: shasum -c ../test.hash
