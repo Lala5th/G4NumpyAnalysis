@@ -14,8 +14,10 @@ add_library(G4NumpyAnalysis SHARED
 		${PROJECT_SOURCE_DIR}/g4cnpy.cpp)
 
 find_package(ZLIB REQUIRED)
+find_package(LIBZIP REQUIRED)
 
 include_directories(${ZLIB_INCLUDE_DIRS})
+include_directories(${LIBZIP_INCLUDE_DIRS})
 
 target_link_libraries(G4NumpyAnalysis ${ZLIB_LIBRARIES})
 
@@ -38,4 +40,7 @@ install(FILES "${PROJECT_BINARY_DIR}/g4numpyanalysis-config-version.cmake" DESTI
 
 
 add_executable(test test.cc ${sources} ${headers})
-target_link_libraries(test ${ZLIB_LIBRARIES} G4NumpyAnalysis)
+target_link_libraries(test ${ZLIB_LIBRARIES} G4NumpyAnalysis zip)
+
+add_executable(test_cont_save test_cont_save.cc ${sources} ${headers})
+target_link_libraries(test_cont_save ${ZLIB_LIBRARIES} G4NumpyAnalysis zip)
