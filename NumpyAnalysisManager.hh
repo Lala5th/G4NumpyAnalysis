@@ -40,7 +40,7 @@ class NumpyAnalysisManager{
             return id;
         }
         template<typename... COLS>
-        void AddData(int id, COLS... input){
+        void AddData(uint id, COLS... input){
             instanceMutex.lock();
             if(dataTitles.size() <= id)
                 throw std::out_of_range("No dataset with ID " + std::to_string(id));
