@@ -16,6 +16,7 @@ class NumpyAnalysisManager{
         NumpyAnalysisManager(bool);
         ~NumpyAnalysisManager();
         void SetFilename(std::string);
+
         template<typename... COLS>
         int CreateDataset(std::string name){
             instanceMutex.lock();
@@ -39,6 +40,7 @@ class NumpyAnalysisManager{
             instanceMutex.unlock();
             return id;
         }
+
         template<typename... COLS>
         void AddData(uint id, COLS... input){
             instanceMutex.lock();
@@ -48,10 +50,11 @@ class NumpyAnalysisManager{
                 ((std::vector<std::tuple<COLS...>>*)data.at(id))->push_back(std::make_tuple(input...));
             }else{
                 std::tuple<COLS...> d = std::make_tuple(input...);
-                g4cnpy::npy_save(dataTitles.at(id)+".npy",&d,{1},"a");
+                g4cnpy::npy_save<COLS...>(dataTitles.at(id)+".npy",&d,{1},"a");
             }
             instanceMutex.unlock();
         }
+
         void WriteData();
         bool isContWrite(){ return continousWrite; }
         static NumpyAnalysisManager* GetInstance(bool = true);
