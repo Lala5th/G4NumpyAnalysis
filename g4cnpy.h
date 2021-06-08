@@ -456,13 +456,21 @@ namespace g4cnpy {
         dict += "{'descr': ";
         construct_tuple_dtype<COLS...>(dict);
         dict += ", 'fortran_order': False, 'shape': (";
-        dict += std::to_string(shape[0]);
-        for(size_t i = 1;i < shape.size();i++) {
+        std::string length;
+        size_t shape_length = 0;
+        for(size_t i = 0;i < shape.size();i++) {
+            length = std::to_string(shape[i]);
+            dict += length;
             dict += ", ";
-            dict += std::to_string(shape[i]);
+            shape_length += length.size() + 1;
         }
-        if(shape.size() == 1) dict += ",";
+
         dict += "), }";
+
+        // Add padding so that impossible to overflow [! Otherwise after much data is written the padding might overwrite data]
+        // Division by 3.32 is because it is each base 10 digit is represented as a byte
+        dict.insert(dict.end(), sizeof(size_t)*shape.size()*8/3.32 - length.size(), ' ');
+
         //pad with spaces so that preamble+dict is modulo 16 bytes. preamble is 10 bytes. dict needs to end with \n
         int remainder = 16 - (10 + dict.size()) % 16;
         dict.insert(dict.end(),remainder,' ');
@@ -487,13 +495,21 @@ namespace g4cnpy {
         dict += map_type(typeid(T));
         dict += std::to_string(sizeof(T));
         dict += "', 'fortran_order': False, 'shape': (";
-        dict += std::to_string(shape[0]);
-        for(size_t i = 1;i < shape.size();i++) {
+        std::string length;
+        size_t shape_length = 0;
+        for(size_t i = 0;i < shape.size();i++) {
+            length = std::to_string(shape[i]);
+            dict += length;
             dict += ", ";
-            dict += std::to_string(shape[i]);
+            shape_length += length.size() + 1;
         }
-        if(shape.size() == 1) dict += ",";
+
         dict += "), }";
+
+        // Add padding so that impossible to overflow [! Otherwise after much data is written the padding might overwrite data]
+        // Division by 3.32 is because it is each base 10 digit is represented as a byte
+        dict.insert(dict.end(), sizeof(size_t)*shape.size()*8/3.32 - shape_length, ' ');
+
         //pad with spaces so that preamble+dict is modulo 16 bytes. preamble is 10 bytes. dict needs to end with \n
         int remainder = 16 - (10 + dict.size()) % 16;
         dict.insert(dict.end(),remainder,' ');
