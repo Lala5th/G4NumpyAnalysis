@@ -1,6 +1,8 @@
 build
 .ccls-cache/
 .ccls
-compile_commands.json
+*.json
 .gitignore
 *.gch
+.*
+out

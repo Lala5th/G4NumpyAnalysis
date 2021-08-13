@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.9)
 
 set(MAJOR_VERSION 2)
 set(MINOR_VERSION 1)
-set(PATCH_VERSION 1)
+set(PATCH_VERSION 2)
 
 project(G4NumpyAnalysis VERSION ${MAJOR_VERSION}.${MINOR_VERSION}.${PATCH_VERSION}  DESCRIPTION "A wrapper for the g4cnpy library for use in Geant4 simulations")
 
@@ -14,8 +14,12 @@ add_library(G4NumpyAnalysis SHARED
 		${PROJECT_SOURCE_DIR}/g4cnpy.cpp)
 
 find_package(ZLIB REQUIRED)
-
-include(${PROJECT_SOURCE_DIR}/cmake/FindZipLib.cmake)
+if(WIN32)
+	find_package(LIBZIP CONFIG REQUIRED)
+	set(LIBZIP_LIBRARY libzip::zip)
+else()
+	include(${PROJECT_SOURCE_DIR}/cmake/FindZipLib.cmake)
+endif()
 
 include_directories(${ZLIB_INCLUDE_DIRS})
 include_directories(${LIBZIP_INCLUDE_DIRS})

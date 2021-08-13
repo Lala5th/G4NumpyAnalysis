@@ -6,14 +6,22 @@
 #include <vector>
 #include <tuple>
 #include <functional>
-#include <stdio.h>
+#include <cstdio>
 
 #include "g4cnpy.h"
 
+#ifdef WIN32
+#ifdef G4NPYANALYSIS_EXPORT
+    #define WINAPI __declspec(dllexport)
+#else
+    #define WINAPI __declspec(dllimport)
+#endif
+#else
+    #define WINAPI
+#endif
 
-class NumpyAnalysisManager{
+class WINAPI NumpyAnalysisManager{
     public:
-        NumpyAnalysisManager(bool);
         ~NumpyAnalysisManager();
         void SetFilename(std::string);
 
@@ -42,7 +50,7 @@ class NumpyAnalysisManager{
         }
 
         template<typename... COLS>
-        void AddData(uint id, COLS... input){
+        void AddData(size_t id, COLS... input){
             instanceMutex.lock();
             if(dataTitles.size() <= id)
                 throw std::out_of_range("No dataset with ID " + std::to_string(id));
@@ -59,6 +67,7 @@ class NumpyAnalysisManager{
         bool isContWrite(){ return continousWrite; }
         static NumpyAnalysisManager* GetInstance(bool = true);
     private:
+        NumpyAnalysisManager(bool);
         bool continousWrite;
         static NumpyAnalysisManager* instance;
         static std::mutex instanceMutex;
@@ -68,5 +77,7 @@ class NumpyAnalysisManager{
         std::vector<size_t> dataDim;
         std::vector<std::function<void(std::string, std::string, const void*, std::string)>> writeFuncs;
 };
+
+#undef WINAPI
 
 #endif

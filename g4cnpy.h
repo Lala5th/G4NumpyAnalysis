@@ -16,8 +16,18 @@
 #include<zlib.h>
 #include<map>
 #include<memory>
-#include<stdint.h>
+#include<cstdint>
 #include<numeric>
+
+#ifdef WIN32
+#ifdef G4NPYANALYSIS_EXPORT
+    #define WINAPI __declspec(dllexport)
+#else
+    #define WINAPI __declspec(dllimport)
+#endif
+#else
+    #define WINAPI
+#endif
 
 namespace g4cnpy {
 
@@ -62,17 +72,17 @@ namespace g4cnpy {
 
     using npz_t = std::map<std::string, NpyArray>;
 
-    char BigEndianTest();
-    char map_type(const std::type_info& t);
+    WINAPI char BigEndianTest();
+    WINAPI char map_type(const std::type_info& t);
     template<typename T> std::vector<char> create_npy_header(const std::vector<size_t>& shape);
     template<typename... COLS> std::vector<char> create_npy_tuple_header(const std::vector<size_t>& shape);
-    void parse_npy_header(FILE* fp,size_t& word_size, std::vector<size_t>& shape, bool& fortran_order);
-    void parse_npy_header(unsigned char* buffer,size_t& word_size, std::vector<size_t>& shape, bool& fortran_order);
-    void parse_npy_header(FILE* fp,std::vector<char> dtype_descr, std::vector<size_t>& shape, bool& fortran_order);
-    void parse_zip_footer(FILE* fp, uint16_t& nrecs, size_t& global_header_size, size_t& global_header_offset);
-    npz_t npz_load(std::string fname);
-    NpyArray npz_load(std::string fname, std::string varname);
-    NpyArray npy_load(std::string fname);
+    WINAPI void parse_npy_header(FILE* fp,size_t& word_size, std::vector<size_t>& shape, bool& fortran_order);
+    WINAPI void parse_npy_header(unsigned char* buffer,size_t& word_size, std::vector<size_t>& shape, bool& fortran_order);
+    WINAPI void parse_npy_header(FILE* fp,std::vector<char> dtype_descr, std::vector<size_t>& shape, bool& fortran_order);
+    WINAPI void parse_zip_footer(FILE* fp, uint16_t& nrecs, size_t& global_header_size, size_t& global_header_offset);
+    WINAPI npz_t npz_load(std::string fname);
+    WINAPI NpyArray npz_load(std::string fname, std::string varname);
+    WINAPI NpyArray npy_load(std::string fname);
 
     template<typename T> std::vector<char>& operator+=(std::vector<char>& lhs, const T rhs) {
         //write in little endian
@@ -83,8 +93,8 @@ namespace g4cnpy {
         return lhs;
     }
 
-    template<> std::vector<char>& operator+=(std::vector<char>& lhs, const std::string rhs);
-    template<> std::vector<char>& operator+=(std::vector<char>& lhs, const char* rhs);
+    template<> WINAPI std::vector<char>& operator+=(std::vector<char>& lhs, const std::string rhs);
+    template<> WINAPI std::vector<char>& operator+=(std::vector<char>& lhs, const char* rhs);
 
 
     template<int N, typename... COLS> constexpr void iterate_dtype(std::vector<char>& descr){
@@ -528,5 +538,7 @@ namespace g4cnpy {
 
 
 }
+
+#undef WINAPI
 
 #endif

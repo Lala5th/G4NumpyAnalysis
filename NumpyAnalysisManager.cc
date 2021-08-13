@@ -1,3 +1,4 @@
+#define G4NPYANALYSIS_EXPORT
 #include "NumpyAnalysisManager.hh"
 
 #include "g4cnpy.h"
@@ -6,7 +7,13 @@
 
 #include <iostream>
 
-NumpyAnalysisManager* NumpyAnalysisManager::instance = 0;
+#ifdef WIN32
+    #define WINAPI __declspec(dllexport)
+#else
+    #define WINAPI
+#endif
+
+NumpyAnalysisManager* NumpyAnalysisManager::instance = nullptr;
 std::mutex NumpyAnalysisManager::instanceMutex = std::mutex();
 
 NumpyAnalysisManager::NumpyAnalysisManager(bool contWrite){

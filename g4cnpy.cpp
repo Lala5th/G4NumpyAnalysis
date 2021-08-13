@@ -12,12 +12,18 @@
 #include<stdexcept>
 #include <regex>
 
-char g4cnpy::BigEndianTest() {
+#ifdef WIN32
+    #define WINAPI __declspec(dllexport)
+#else
+    #define WINAPI
+#endif
+
+WINAPI char g4cnpy::BigEndianTest() {
     int x = 1;
     return (((char *)&x)[0]) ? '<' : '>';
 }
 
-char g4cnpy::map_type(const std::type_info& t)
+WINAPI char g4cnpy::map_type(const std::type_info& t)
 {
     if(t == typeid(float) ) return 'f';
     if(t == typeid(double) ) return 'f';
@@ -44,12 +50,12 @@ char g4cnpy::map_type(const std::type_info& t)
     else return '?';
 }
 
-template<> std::vector<char>& g4cnpy::operator+=(std::vector<char>& lhs, const std::string rhs) {
+template<> WINAPI std::vector<char>& g4cnpy::operator+=(std::vector<char>& lhs, const std::string rhs) {
     lhs.insert(lhs.end(),rhs.begin(),rhs.end());
     return lhs;
 }
 
-template<> std::vector<char>& g4cnpy::operator+=(std::vector<char>& lhs, const char* rhs) {
+template<> WINAPI std::vector<char>& g4cnpy::operator+=(std::vector<char>& lhs, const char* rhs) {
     //write in little endian
     size_t len = strlen(rhs);
     lhs.reserve(len);
@@ -59,7 +65,7 @@ template<> std::vector<char>& g4cnpy::operator+=(std::vector<char>& lhs, const c
     return lhs;
 }
 
-void g4cnpy::parse_npy_header(unsigned char* buffer,size_t& word_size, std::vector<size_t>& shape, bool& fortran_order) {
+WINAPI void g4cnpy::parse_npy_header(unsigned char* buffer,size_t& word_size, std::vector<size_t>& shape, bool& fortran_order) {
     //std::string magic_string(buffer,6);
     uint8_t major_version = *reinterpret_cast<uint8_t*>(buffer+6);
     uint8_t minor_version = *reinterpret_cast<uint8_t*>(buffer+7);
@@ -101,7 +107,7 @@ void g4cnpy::parse_npy_header(unsigned char* buffer,size_t& word_size, std::vect
     word_size = atoi(str_ws.substr(0,loc2).c_str());
 }
 
-void g4cnpy::parse_npy_header(FILE* fp, size_t& word_size, std::vector<size_t>& shape, bool& fortran_order) {
+WINAPI void g4cnpy::parse_npy_header(FILE* fp, size_t& word_size, std::vector<size_t>& shape, bool& fortran_order) {
     char buffer[256];
     size_t res = fread(buffer,sizeof(char),11,fp);
     if(res != 11)
@@ -152,7 +158,7 @@ void g4cnpy::parse_npy_header(FILE* fp, size_t& word_size, std::vector<size_t>& 
     word_size = atoi(str_ws.substr(0,loc2).c_str());
 }
 
-void g4cnpy::parse_npy_header(FILE* fp, std::vector<char> dtype_descr, std::vector<size_t>& shape, bool& fortran_order) {
+WINAPI void g4cnpy::parse_npy_header(FILE* fp, std::vector<char> dtype_descr, std::vector<size_t>& shape, bool& fortran_order) {
     char buffer[256];
     size_t res = fread(buffer,sizeof(char),11,fp);
     if(res != 11)
@@ -212,7 +218,7 @@ void g4cnpy::parse_npy_header(FILE* fp, std::vector<char> dtype_descr, std::vect
     }
 }
 
-void g4cnpy::parse_zip_footer(FILE* fp, uint16_t& nrecs, size_t& global_header_size, size_t& global_header_offset)
+WINAPI void g4cnpy::parse_zip_footer(FILE* fp, uint16_t& nrecs, size_t& global_header_size, size_t& global_header_offset)
 {
     std::vector<char> footer(22);
     fseek(fp,-22,SEEK_END);
@@ -235,7 +241,7 @@ void g4cnpy::parse_zip_footer(FILE* fp, uint16_t& nrecs, size_t& global_header_s
     assert(comment_len == 0);
 }
 
-g4cnpy::NpyArray load_the_npy_file(FILE* fp) {
+WINAPI g4cnpy::NpyArray load_the_npy_file(FILE* fp) {
     std::vector<size_t> shape;
     size_t word_size;
     bool fortran_order;
@@ -248,7 +254,7 @@ g4cnpy::NpyArray load_the_npy_file(FILE* fp) {
     return arr;
 }
 
-g4cnpy::NpyArray load_the_npz_array(FILE* fp, uint32_t compr_bytes, uint32_t uncompr_bytes) {
+WINAPI g4cnpy::NpyArray load_the_npz_array(FILE* fp, uint32_t compr_bytes, uint32_t uncompr_bytes) {
 
     std::vector<unsigned char> buffer_compr(compr_bytes);
     std::vector<unsigned char> buffer_uncompr(uncompr_bytes);
@@ -287,7 +293,7 @@ g4cnpy::NpyArray load_the_npz_array(FILE* fp, uint32_t compr_bytes, uint32_t unc
     return array;
 }
 
-g4cnpy::npz_t g4cnpy::npz_load(std::string fname) {
+WINAPI g4cnpy::npz_t g4cnpy::npz_load(std::string fname) {
     FILE* fp = fopen(fname.c_str(),"rb");
 
     if(!fp) {
@@ -336,7 +342,7 @@ g4cnpy::npz_t g4cnpy::npz_load(std::string fname) {
     return arrays;
 }
 
-g4cnpy::NpyArray g4cnpy::npz_load(std::string fname, std::string varname) {
+WINAPI g4cnpy::NpyArray g4cnpy::npz_load(std::string fname, std::string varname) {
     FILE* fp = fopen(fname.c_str(),"rb");
 
     if(!fp) throw std::runtime_error("npz_load: Unable to open file "+fname);
@@ -384,7 +390,7 @@ g4cnpy::NpyArray g4cnpy::npz_load(std::string fname, std::string varname) {
     throw std::runtime_error("npz_load: Variable name "+varname+" not found in "+fname);
 }
 
-g4cnpy::NpyArray g4cnpy::npy_load(std::string fname) {
+WINAPI g4cnpy::NpyArray g4cnpy::npy_load(std::string fname) {
 
     FILE* fp = fopen(fname.c_str(), "rb");
 
