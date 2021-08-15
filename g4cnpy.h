@@ -2,6 +2,8 @@
 //Released under MIT License
 //license available in LICENSE file, or at http://www.opensource.org/licenses/mit-license.php
 
+// Modified by Lajos Palanki<lala5th@gmail.com> 
+
 #ifndef LIBG4CNPY_H_
 #define LIBG4CNPY_H_
 
@@ -18,6 +20,7 @@
 #include<memory>
 #include<cstdint>
 #include<numeric>
+#include<cstring>
 
 #ifdef WIN32
 #ifdef G4NPYANALYSIS_EXPORT
@@ -45,11 +48,19 @@ namespace g4cnpy {
 
         template<typename T>
         T* data() {
+            if ((((uintptr_t)data_holder->data()) % alignof(T) != 0)){
+                assert(word_size == sizeof(T));
+                T* data_container = new T[num_vals];
+                std::memcpy(data_container,data_holder->data(), num_vals*word_size);
+                data_holder.reset(new std::vector<char>((char*) data_container, (char*) (data_container + num_vals)));
+                return data_container;
+            }
             return reinterpret_cast<T*>(&(*data_holder)[0]);
         }
 
         template<typename T>
         const T* data() const {
+            assert(((uintptr_t)data_holder->data()) % alignof(T) == 0);
             return reinterpret_cast<T*>(&(*data_holder)[0]);
         }
 
@@ -97,7 +108,7 @@ namespace g4cnpy {
     template<> WINAPI std::vector<char>& operator+=(std::vector<char>& lhs, const char* rhs);
 
 
-    template<int N, typename... COLS> constexpr void iterate_dtype(std::vector<char>& descr){
+    template<size_t N, typename... COLS> constexpr void iterate_dtype(std::vector<char>& descr){
 
         char endianTest = BigEndianTest();
 
@@ -125,7 +136,7 @@ namespace g4cnpy {
 
     }
 
-    template<int N,typename... COLS> constexpr void iterative_write_data(std::tuple<COLS...> data, const std::vector<size_t>& shape,FILE* fp){
+    template<size_t N,typename... COLS> constexpr void iterative_write_data(std::tuple<COLS...> data, const std::vector<size_t>& shape,FILE* fp){
 
         fwrite(&std::get<N>(data),sizeof(typename std::tuple_element<N,std::tuple<COLS...>>::type),1,fp);
         if constexpr(N != sizeof...(COLS) - 1){
@@ -133,7 +144,7 @@ namespace g4cnpy {
         }
     }
 
-    template<int N,typename... COLS> constexpr size_t size_of(){
+    template<size_t N,typename... COLS> constexpr size_t size_of(){
 
         size_t size = 0;
         size += sizeof(typename std::tuple_element<N,std::tuple<COLS...>>::type);
@@ -143,9 +154,9 @@ namespace g4cnpy {
         return size;
     }
 
-    template<int N,typename... COLS> constexpr void generate_crc(uint32_t& crc, std::tuple<COLS...> data){
+    template<size_t N,typename... COLS> constexpr void generate_crc(uint32_t& crc, std::tuple<COLS...> data){
 
-        crc = crc32(crc,(uint8_t*)&std::get<N>(data),sizeof(typename std::tuple_element<N,std::tuple<COLS...>>::type));
+        crc = crc32(crc,(unsigned char*)&std::get<N>(data),sizeof(typename std::tuple_element<N,std::tuple<COLS...>>::type));
         if constexpr(N != sizeof...(COLS) - 1){
             generate_crc<N+1,COLS...>(crc,data);
         }
@@ -284,8 +295,8 @@ namespace g4cnpy {
         size_t nbytes = nels*sizeof(T) + npy_header.size();
 
         //get the CRC of the data to be added
-        uint32_t crc = crc32(0L,(uint8_t*)&npy_header[0],npy_header.size());
-        crc = crc32(crc,(uint8_t*)data,nels*sizeof(T));
+        uint32_t crc = crc32(0L,(unsigned char*)&npy_header[0],npy_header.size());
+        crc = crc32(crc,(unsigned char*)data,nels*sizeof(T));
 
         //build the local header
         std::vector<char> local_header;
@@ -380,10 +391,9 @@ namespace g4cnpy {
         for(auto d : shape){
             len *= d;
         }
-        uint32_t crc = crc32(0L,(uint8_t*)&npy_header[0],npy_header.size());
+        uint32_t crc = crc32(0L,(unsigned char*)&npy_header[0],npy_header.size());
         for(size_t i = 0;i < len;i++)
             generate_crc<0,COLS...>(crc,data[i]);
-        //crc = crc32(crc,(uint8_t*)data.data(),nels*size_of<0,COLS...>());
 
         //build the local header
         std::vector<char> local_header;

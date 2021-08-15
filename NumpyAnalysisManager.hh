@@ -1,3 +1,6 @@
+// Written by Lajos Palanki<lala5th@gmail.com>
+// Relased under MIT license
+
 #ifndef NumpyAnalysisManager_hh
 #define NumpyAnalysisManager_hh
 

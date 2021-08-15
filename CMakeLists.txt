@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.9)
 
 set(MAJOR_VERSION 2)
 set(MINOR_VERSION 1)
-set(PATCH_VERSION 2)
+set(PATCH_VERSION 3)
 
 project(G4NumpyAnalysis VERSION ${MAJOR_VERSION}.${MINOR_VERSION}.${PATCH_VERSION}  DESCRIPTION "A wrapper for the g4cnpy library for use in Geant4 simulations")
 
@@ -49,3 +49,6 @@ target_link_libraries(test ${ZLIB_LIBRARIES} G4NumpyAnalysis ${LIBZIP_LIBRARY})
 
 add_executable(test_cont_save test_cont_save.cc ${sources} ${headers})
 target_link_libraries(test_cont_save ${ZLIB_LIBRARIES} G4NumpyAnalysis ${LIBZIP_LIBRARY})
+
+add_executable(test_npy cnpy_example1.cpp ${sources} ${headers})
+target_link_libraries(test_npy G4NumpyAnalysis ${ZLIB_LIBRARIES} ${LIBZIP_LIBRARY})

@@ -48,3 +48,7 @@ jobs:
     - name: npz check
       run: shasum -c ../test.hash
       working-directory: ./build
+
+    - name: npy read check
+      run: ./test_npy
+      working-directory: ./build

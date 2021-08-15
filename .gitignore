@@ -6,3 +6,4 @@ build
 *.gch
 .*
 out
+!.github

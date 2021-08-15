@@ -1,3 +1,6 @@
+// Written by Lajos Palanki<lala5th@gmail.com>
+// Relased under MIT license
+
 #define G4NPYANALYSIS_EXPORT
 #include "NumpyAnalysisManager.hh"
 
@@ -6,6 +9,7 @@
 #include "zip.h"
 
 #include <iostream>
+#include <cstring>
 
 #ifdef WIN32
     #define WINAPI __declspec(dllexport)
@@ -45,7 +49,9 @@ void NumpyAnalysisManager::WriteData(){
     if(!continousWrite){
     std::string stat = "w";
     for(size_t i = 0;i < data.size();i++){
-        if(((std::vector<std::tuple<>>*)data[i])->empty()) continue;
+        std::vector<std::tuple<>> d;
+        std::memcpy(&d, data[i], sizeof(std::vector<std::tuple<>>));
+        if(d.empty()) continue;
         writeFuncs[i](fname,dataTitles[i],data.at(i),stat);
         stat = "a";
     }

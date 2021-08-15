@@ -2,15 +2,18 @@
 //Released under MIT License
 //license available in LICENSE file, or at http://www.opensource.org/licenses/mit-license.php
 
+// Modified by Lajos Palanki<lala5th@gmail.com>
+
 #include"g4cnpy.h"
 #include<complex>
 #include<cstdlib>
 #include<algorithm>
 #include<cstring>
 #include<iomanip>
-#include<stdint.h>
+#include<cstdint>
 #include<stdexcept>
-#include <regex>
+#include<regex>
+#include<cstring>
 
 #ifdef WIN32
     #define WINAPI __declspec(dllexport)
@@ -30,7 +33,7 @@ WINAPI char g4cnpy::map_type(const std::type_info& t)
     if(t == typeid(long double) ) return 'f';
 
     if(t == typeid(int) ) return 'i';
-    if(t == typeid(char) ) return 'i';
+    if(t == typeid(signed char) ) return 'i';
     if(t == typeid(short) ) return 'i';
     if(t == typeid(long) ) return 'i';
     if(t == typeid(long long) ) return 'i';
@@ -67,9 +70,11 @@ template<> WINAPI std::vector<char>& g4cnpy::operator+=(std::vector<char>& lhs, 
 
 WINAPI void g4cnpy::parse_npy_header(unsigned char* buffer,size_t& word_size, std::vector<size_t>& shape, bool& fortran_order) {
     //std::string magic_string(buffer,6);
-    uint8_t major_version = *reinterpret_cast<uint8_t*>(buffer+6);
-    uint8_t minor_version = *reinterpret_cast<uint8_t*>(buffer+7);
-    uint16_t header_len = *reinterpret_cast<uint16_t*>(buffer+8);
+    uint8_t major_version, minor_version;
+    std::memcpy(&major_version, buffer + 6, sizeof(uint8_t));
+    std::memcpy(&minor_version, buffer + 7, sizeof(uint8_t));
+    uint16_t header_len;
+    std::memcpy(&header_len, buffer + 8, sizeof(uint16_t));
     std::string header(reinterpret_cast<char*>(buffer+9),header_len);
 
     size_t loc1, loc2;
@@ -226,14 +231,19 @@ WINAPI void g4cnpy::parse_zip_footer(FILE* fp, uint16_t& nrecs, size_t& global_h
     if(res != 22)
         throw std::runtime_error("parse_zip_footer: failed fread");
 
+    uint32_t g_header_size, g_header_offset;
+    
     uint16_t disk_no, disk_start, nrecs_on_disk, comment_len;
-    disk_no = *(uint16_t*) &footer[4];
-    disk_start = *(uint16_t*) &footer[6];
-    nrecs_on_disk = *(uint16_t*) &footer[8];
-    nrecs = *(uint16_t*) &footer[10];
-    global_header_size = *(uint32_t*) &footer[12];
-    global_header_offset = *(uint32_t*) &footer[16];
-    comment_len = *(uint16_t*) &footer[20];
+    std::memcpy(&disk_no,&footer[4],sizeof(uint16_t));
+    std::memcpy(&disk_start,&footer[6],sizeof(uint16_t));
+    std::memcpy(&nrecs_on_disk,&footer[8],sizeof(uint16_t));
+    std::memcpy(&nrecs,&footer[10],sizeof(uint16_t));
+    std::memcpy(&g_header_size,&footer[12],sizeof(uint32_t));
+    std::memcpy(&g_header_offset,&footer[16],sizeof(uint32_t));
+    std::memcpy(&comment_len,&footer[20],sizeof(uint16_t));
+
+    global_header_offset = g_header_offset;
+    global_header_size = g_header_size;
 
     assert(disk_no == 0);
     assert(disk_start == 0);
@@ -312,7 +322,8 @@ WINAPI g4cnpy::npz_t g4cnpy::npz_load(std::string fname) {
         if(local_header[2] != 0x03 || local_header[3] != 0x04) break;
 
         //read in the variable name
-        uint16_t name_len = *(uint16_t*) &local_header[26];
+        uint16_t name_len;
+        std::memcpy(&name_len, &local_header[26], sizeof(uint16_t));
         std::string varname(name_len,' ');
         size_t vname_res = fread(&varname[0],sizeof(char),name_len,fp);
         if(vname_res != name_len)
@@ -322,7 +333,8 @@ WINAPI g4cnpy::npz_t g4cnpy::npz_load(std::string fname) {
         varname.erase(varname.end()-4,varname.end());
 
         //read in the extra field
-        uint16_t extra_field_len = *(uint16_t*) &local_header[28];
+        uint16_t extra_field_len;
+        std::memcpy(&extra_field_len,&local_header[28],sizeof(uint16_t));
         if(extra_field_len > 0) {
             std::vector<char> buff(extra_field_len);
             size_t efield_res = fread(&buff[0],sizeof(char),extra_field_len,fp);
@@ -330,9 +342,12 @@ WINAPI g4cnpy::npz_t g4cnpy::npz_load(std::string fname) {
                 throw std::runtime_error("npz_load: failed fread");
         }
 
-        uint16_t compr_method = *reinterpret_cast<uint16_t*>(&local_header[0]+8);
-        uint32_t compr_bytes = *reinterpret_cast<uint32_t*>(&local_header[0]+18);
-        uint32_t uncompr_bytes = *reinterpret_cast<uint32_t*>(&local_header[0]+22);
+        uint16_t compr_method;
+        uint32_t compr_bytes;
+        uint32_t uncompr_bytes;
+        std::memcpy(&compr_method, &local_header[0]+8, sizeof(uint16_t));
+        std::memcpy(&compr_bytes, &local_header[0]+18, sizeof(uint32_t));
+        std::memcpy(&uncompr_bytes, &local_header[0]+22, sizeof(uint32_t));
 
         if(compr_method == 0) {arrays[varname] = load_the_npy_file(fp);}
         else {arrays[varname] = load_the_npz_array(fp,compr_bytes,uncompr_bytes);}
@@ -357,7 +372,8 @@ WINAPI g4cnpy::NpyArray g4cnpy::npz_load(std::string fname, std::string varname)
         if(local_header[2] != 0x03 || local_header[3] != 0x04) break;
 
         //read in the variable name
-        uint16_t name_len = *(uint16_t*) &local_header[26];
+        uint16_t name_len;
+        std::memcpy(&name_len, &local_header[26],sizeof(uint16_t));
         std::string vname(name_len,' ');
         size_t vname_res = fread(&vname[0],sizeof(char),name_len,fp);
         if(vname_res != name_len)
@@ -365,12 +381,16 @@ WINAPI g4cnpy::NpyArray g4cnpy::npz_load(std::string fname, std::string varname)
         vname.erase(vname.end()-4,vname.end()); //erase the lagging .npy
 
         //read in the extra field
-        uint16_t extra_field_len = *(uint16_t*) &local_header[28];
+        uint16_t extra_field_len;
+        std::memcpy(&extra_field_len, &local_header[28],sizeof(uint16_t));
         fseek(fp,extra_field_len,SEEK_CUR); //skip past the extra field
 
-        uint16_t compr_method = *reinterpret_cast<uint16_t*>(&local_header[0]+8);
-        uint32_t compr_bytes = *reinterpret_cast<uint32_t*>(&local_header[0]+18);
-        uint32_t uncompr_bytes = *reinterpret_cast<uint32_t*>(&local_header[0]+22);
+        uint16_t compr_method;
+        uint32_t compr_bytes;
+        uint32_t uncompr_bytes;
+        std::memcpy(&compr_method, &local_header[0]+8, sizeof(uint16_t));
+        std::memcpy(&compr_bytes, &local_header[0]+18, sizeof(uint32_t));
+        std::memcpy(&uncompr_bytes, &local_header[0]+22, sizeof(uint32_t));
 
         if(vname == varname) {
             NpyArray array  = (compr_method == 0) ? load_the_npy_file(fp) : load_the_npz_array(fp,compr_bytes,uncompr_bytes);
@@ -379,7 +399,8 @@ WINAPI g4cnpy::NpyArray g4cnpy::npz_load(std::string fname, std::string varname)
         }
         else {
             //skip past the data
-            uint32_t size = *(uint32_t*) &local_header[22];
+            uint32_t size;
+            std::memcpy(&size,&local_header[22],sizeof(uint32_t));
             fseek(fp,size,SEEK_CUR);
         }
     }
